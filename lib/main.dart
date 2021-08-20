@@ -1,6 +1,4 @@
 import 'dart:ui';
-
-import 'package:autocomplete_textfield_ns/autocomplete_textfield_ns.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -812,7 +810,7 @@ class _HomeFormState extends State<HomeForm> {
                                           duration: Duration(seconds: 3),
                                         ));
                                         initData();
-                                        break;
+                                        return;
                                       case 0:
                                         print('submit failure');
                                         ScaffoldMessenger.of(context)
@@ -820,10 +818,11 @@ class _HomeFormState extends State<HomeForm> {
                                           content: Text('전송 실패. 다시시도해주세요.'),
                                           duration: Duration(seconds: 3),
                                         ));
-                                        break;
+                                        return;
                                     }
                                   }
-                                } else {
+                                }
+                                else {
                                   if (homeTeamName == null ||
                                       awayTeamName == null ||
                                       leagueName == null ||
@@ -850,7 +849,7 @@ class _HomeFormState extends State<HomeForm> {
                                           duration: Duration(seconds: 3),
                                         ));
                                         initData();
-                                        break;
+                                        return;
                                       case 0:
                                         print('submit failure');
                                         ScaffoldMessenger.of(context)
@@ -858,7 +857,7 @@ class _HomeFormState extends State<HomeForm> {
                                           content: Text('전송 실패. 다시시도해주세요.'),
                                           duration: Duration(seconds: 3),
                                         ));
-                                        break;
+                                        return;
                                     }
                                   }
                                 }
