@@ -9,6 +9,7 @@ void main() => runApp(App());
 
 // Local Server
 // const String server = '211.204.237.78:8080';
+
 // Deploy Server
 const String server = '3.35.55.202:8080';
 
