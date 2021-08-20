@@ -9,6 +9,11 @@ import 'package:with_admin/player.dart';
 
 void main() => runApp(App());
 
+// Local Server
+const String server = '211.204.237.78:8080';
+// Deploy Server
+// const String server = '211.204.237.78:8080';
+
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -109,9 +114,9 @@ class _HomeFormState extends State<HomeForm> {
   Future loadData() async {
     // http://211.204.237.78:8080/api/getLeagueName
     // http://211.204.237.78:8080/api/getClubName
-    var url = Uri.http('211.204.237.78:8080', '/api/getLeagueName',
+    var url = Uri.http('$server', '/api/getLeagueName',
         {'q': '{http}', 'Content-Type': 'application/json;charset=UTF-8'});
-    var url2 = Uri.http('211.204.237.78:8080', '/api/getClubName',
+    var url2 = Uri.http('$server', '/api/getClubName',
         {'q': '{http}', 'Content-Type': 'application/json;charset=UTF-8'});
     var response;
     var response2;
@@ -148,7 +153,7 @@ class _HomeFormState extends State<HomeForm> {
     String? matchTime,
     required int? currentDate,
   }) async {
-    var url = Uri.http('211.204.237.78:8080', '/api/setClubRecord');
+    var url = Uri.http('$server', '/api/setClubRecord');
     var body = convert.jsonEncode({
       'homeTeamName': homeTeamName,
       'awayTeamName': awayTeamName,
@@ -204,600 +209,672 @@ class _HomeFormState extends State<HomeForm> {
     if (widget.homeStatus == '경기등록') {
       return FutureBuilder(
         future: loadData(),
-        builder: (context, snapshot) => Form(
-          key: widget.formKey,
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    SizedBox(
-                      height: 100,
-                      width: 200,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+        builder: (context, snapshot) => !snapshot.hasError
+            ? Form(
+                key: widget.formKey,
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text('홈 팀명',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          Autocomplete<String>(
-                            optionsBuilder:
-                                (TextEditingValue textEditingValue) {
-                              if (textEditingValue.text == '') {
-                                return const Iterable<String>.empty();
-                              }
-                              return _kTeamNames.where((String option) {
-                                return option.contains(textEditingValue.text);
-                              });
-                            },
-                            onSelected: (String selection) {
-                              print('You select $selection');
-                              homeTeamName = selection;
-                              print('homeTeamName is ${homeTeamName}');
-                            },
+                          SizedBox(
+                            height: 100,
+                            width: 200,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('홈 팀명',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold)),
+                                Autocomplete<String>(
+                                  optionsBuilder:
+                                      (TextEditingValue textEditingValue) {
+                                    if (textEditingValue.text == '') {
+                                      return const Iterable<String>.empty();
+                                    }
+                                    return _kTeamNames.where((String option) {
+                                      return option
+                                          .contains(textEditingValue.text);
+                                    });
+                                  },
+                                  onSelected: (String selection) {
+                                    print('You select $selection');
+                                    homeTeamName = selection;
+                                    print('homeTeamName is ${homeTeamName}');
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 100,
+                            width: 200,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('어웨이 팀명',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold)),
+                                Autocomplete<String>(
+                                  optionsBuilder:
+                                      (TextEditingValue textEditingValue) {
+                                    if (textEditingValue.text == '') {
+                                      return const Iterable<String>.empty();
+                                    }
+                                    return _kTeamNames.where((String option) {
+                                      return option
+                                          .contains(textEditingValue.text);
+                                    });
+                                  },
+                                  onSelected: (String selection) {
+                                    print('You select $selection');
+                                    awayTeamName = selection;
+                                    print('awayTeamName is ${awayTeamName}');
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    SizedBox(
-                      height: 100,
-                      width: 200,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('어웨이 팀명',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          Autocomplete<String>(
-                            optionsBuilder:
-                                (TextEditingValue textEditingValue) {
-                              if (textEditingValue.text == '') {
-                                return const Iterable<String>.empty();
-                              }
-                              return _kTeamNames.where((String option) {
-                                return option.contains(textEditingValue.text);
-                              });
-                            },
-                            onSelected: (String selection) {
-                              print('You select $selection');
-                              awayTeamName = selection;
-                              print('awayTeamName is ${awayTeamName}');
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Checkbox(
-                    value: isResult,
-                    onChanged: (value) {
-                      isResult = !isResult;
-                      homeScore = null;
-                      awayScore = null;
-                      setState(() {});
-                    }),
-                isResult
-                    ? SizedBox(
-                        height: 400,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(
-                              child: Row(
+                      Checkbox(
+                          value: isResult,
+                          onChanged: (value) {
+                            isResult = !isResult;
+                            homeScore = null;
+                            awayScore = null;
+                            setState(() {});
+                          }),
+                      isResult
+                          ? SizedBox(
+                              height: 400,
+                              child: Column(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Expanded(
-                                    child: Column(
+                                    child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        Text('홈 점수',
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold)),
-                                        SizedBox(
-                                          height: 40,
-                                          width: 40,
-                                          child: TextFormField(
-                                            textAlign: TextAlign.center,
-                                            onChanged: (value) {
-                                              homeScore = value;
-                                            },
-                                          ),
-                                        ),
-                                        Text(
-                                          '골 넣은사람',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 50,
-                                          width: 250,
-                                          child: Row(
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('이름 : '),
+                                              Text('홈 점수',
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
                                               SizedBox(
-                                                  width: 70,
-                                                  child: TextFormField(
-                                                    controller: homeGoalName,
-                                                  )),
-                                              Text('시간 : '),
-                                              SizedBox(
-                                                  width: 30,
-                                                  child: TextFormField(
-                                                    controller: homeGoalTime,
-                                                  )),
-                                              Text('분'),
-                                              IconButton(
-                                                  onPressed: () {
-                                                    if (homeGoalName
-                                                            .text.isNotEmpty &&
-                                                        homeGoalTime
-                                                            .text.isNotEmpty) {
-                                                      Player p = Player(
-                                                          name:
-                                                              homeGoalName.text,
-                                                          time: homeGoalTime
-                                                              .text);
-                                                      homeGoalHistory.add(p);
-                                                      homeGoalName.clear();
-                                                      homeGoalTime.clear();
-                                                      setState(() {});
-                                                    }
+                                                height: 40,
+                                                width: 40,
+                                                child: TextFormField(
+                                                  textAlign: TextAlign.center,
+                                                  onChanged: (value) {
+                                                    homeScore = value;
                                                   },
-                                                  icon: Icon(
-                                                    Icons.check,
-                                                    color: Colors.green,
-                                                  ))
-                                            ],
-                                          ),
-                                        ),
-                                        homeGoalHistory.isEmpty
-                                            ? Text(
-                                                '골 넣은사람 등록해주세요.',
+                                                ),
+                                              ),
+                                              Text(
+                                                '골 넣은사람',
                                                 style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.lightGreen),
-                                              )
-                                            : Row(
-                                                children: homeGoalHistory
-                                                    .map((e) => InkWell(
-                                                          onTap: () {
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 50,
+                                                width: 250,
+                                                child: Row(
+                                                  children: [
+                                                    Text('이름 : '),
+                                                    SizedBox(
+                                                        width: 70,
+                                                        child: TextFormField(
+                                                          controller:
+                                                              homeGoalName,
+                                                        )),
+                                                    Text('시간 : '),
+                                                    SizedBox(
+                                                        width: 30,
+                                                        child: TextFormField(
+                                                          controller:
+                                                              homeGoalTime,
+                                                        )),
+                                                    Text('분'),
+                                                    IconButton(
+                                                        onPressed: () {
+                                                          if (homeGoalName.text
+                                                                  .isNotEmpty &&
+                                                              homeGoalTime.text
+                                                                  .isNotEmpty) {
+                                                            Player p = Player(
+                                                                name:
+                                                                    homeGoalName
+                                                                        .text,
+                                                                time:
+                                                                    homeGoalTime
+                                                                        .text);
                                                             homeGoalHistory
-                                                                .remove(e);
+                                                                .add(p);
+                                                            homeGoalName
+                                                                .clear();
+                                                            homeGoalTime
+                                                                .clear();
                                                             setState(() {});
-                                                          },
-                                                          child: Text(
-                                                              '${e.name}, ${e.time}`',
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                              )),
+                                                          }
+                                                        },
+                                                        icon: Icon(
+                                                          Icons.check,
+                                                          color: Colors.green,
                                                         ))
-                                                    .toList(),
+                                                  ],
+                                                ),
                                               ),
-                                        Text(
-                                          '어시스트 한사람',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 50,
-                                          width: 250,
-                                          child: Row(
-                                            children: [
-                                              Text('이름 : '),
-                                              SizedBox(
-                                                  width: 70,
-                                                  child: TextFormField(
-                                                    controller: homeAssistName,
-                                                  )),
-                                              Text('시간 : '),
-                                              SizedBox(
-                                                  width: 30,
-                                                  child: TextFormField(
-                                                    controller: homeAssistTime,
-                                                  )),
-                                              Text('분'),
-                                              IconButton(
-                                                  onPressed: () {
-                                                    if (homeAssistName
-                                                            .text.isNotEmpty &&
-                                                        homeAssistTime
-                                                            .text.isNotEmpty) {
-                                                      Player p = Player(
-                                                          name: homeAssistName
-                                                              .text,
-                                                          time: homeAssistTime
-                                                              .text);
-                                                      homeAssistHistory.add(p);
-                                                      homeAssistName.clear();
-                                                      homeAssistTime.clear();
-                                                      setState(() {});
-                                                    }
-                                                  },
-                                                  icon: Icon(
-                                                    Icons.check,
-                                                    color: Colors.green,
-                                                  ))
-                                            ],
-                                          ),
-                                        ),
-                                        homeAssistHistory.isEmpty
-                                            ? Text(
-                                                '어시스트 한 사람 등록해주세요.',
+                                              homeGoalHistory.isEmpty
+                                                  ? Text(
+                                                      '골 넣은사람 등록해주세요.',
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors
+                                                              .lightGreen),
+                                                    )
+                                                  : Row(
+                                                      children: homeGoalHistory
+                                                          .map((e) => InkWell(
+                                                                onTap: () {
+                                                                  homeGoalHistory
+                                                                      .remove(
+                                                                          e);
+                                                                  setState(
+                                                                      () {});
+                                                                },
+                                                                child: Text(
+                                                                    '${e.name}, ${e.time}`',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                    )),
+                                                              ))
+                                                          .toList(),
+                                                    ),
+                                              Text(
+                                                '어시스트 한사람',
                                                 style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.lightGreen),
-                                              )
-                                            : Row(
-                                                children: homeAssistHistory
-                                                    .map((e) => InkWell(
-                                                          onTap: () {
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 50,
+                                                width: 250,
+                                                child: Row(
+                                                  children: [
+                                                    Text('이름 : '),
+                                                    SizedBox(
+                                                        width: 70,
+                                                        child: TextFormField(
+                                                          controller:
+                                                              homeAssistName,
+                                                        )),
+                                                    Text('시간 : '),
+                                                    SizedBox(
+                                                        width: 30,
+                                                        child: TextFormField(
+                                                          controller:
+                                                              homeAssistTime,
+                                                        )),
+                                                    Text('분'),
+                                                    IconButton(
+                                                        onPressed: () {
+                                                          if (homeAssistName
+                                                                  .text
+                                                                  .isNotEmpty &&
+                                                              homeAssistTime
+                                                                  .text
+                                                                  .isNotEmpty) {
+                                                            Player p = Player(
+                                                                name:
+                                                                    homeAssistName
+                                                                        .text,
+                                                                time:
+                                                                    homeAssistTime
+                                                                        .text);
                                                             homeAssistHistory
-                                                                .remove(e);
+                                                                .add(p);
+                                                            homeAssistName
+                                                                .clear();
+                                                            homeAssistTime
+                                                                .clear();
                                                             setState(() {});
-                                                          },
-                                                          child: Text(
-                                                              '${e.name}, ${e.time}`',
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                              )),
+                                                          }
+                                                        },
+                                                        icon: Icon(
+                                                          Icons.check,
+                                                          color: Colors.green,
                                                         ))
-                                                    .toList(),
+                                                  ],
+                                                ),
                                               ),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text('어웨이 점수',
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold)),
-                                        SizedBox(
-                                          height: 40,
-                                          width: 40,
-                                          child: TextFormField(
-                                            textAlign: TextAlign.center,
-                                            onChanged: (value) {
-                                              awayScore = value;
-                                            },
-                                          ),
-                                        ),
-                                        Text(
-                                          '골 넣은사람',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 50,
-                                          width: 250,
-                                          child: Row(
-                                            children: [
-                                              Text('이름 : '),
-                                              SizedBox(
-                                                  width: 70,
-                                                  child: TextFormField(
-                                                    controller: awayGoalName,
-                                                  )),
-                                              Text('시간 : '),
-                                              SizedBox(
-                                                  width: 30,
-                                                  child: TextFormField(
-                                                    controller: awayGoalTime,
-                                                  )),
-                                              Text('분'),
-                                              IconButton(
-                                                  onPressed: () {
-                                                    if (awayGoalName
-                                                            .text.isNotEmpty &&
-                                                        awayGoalTime
-                                                            .text.isNotEmpty) {
-                                                      Player p = Player(
-                                                          name:
-                                                              awayGoalName.text,
-                                                          time: awayGoalTime
-                                                              .text);
-                                                      awayGoalHistory.add(p);
-                                                      awayGoalName.clear();
-                                                      awayGoalTime.clear();
-                                                      setState(() {});
-                                                    }
-                                                  },
-                                                  icon: Icon(
-                                                    Icons.check,
-                                                    color: Colors.green,
-                                                  ))
+                                              homeAssistHistory.isEmpty
+                                                  ? Text(
+                                                      '어시스트 한 사람 등록해주세요.',
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors
+                                                              .lightGreen),
+                                                    )
+                                                  : Row(
+                                                      children:
+                                                          homeAssistHistory
+                                                              .map(
+                                                                  (e) =>
+                                                                      InkWell(
+                                                                        onTap:
+                                                                            () {
+                                                                          homeAssistHistory
+                                                                              .remove(e);
+                                                                          setState(
+                                                                              () {});
+                                                                        },
+                                                                        child: Text(
+                                                                            '${e.name}, ${e.time}`',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontSize: 12,
+                                                                            )),
+                                                                      ))
+                                                              .toList(),
+                                                    ),
                                             ],
                                           ),
                                         ),
-                                        awayGoalHistory.isEmpty
-                                            ? Text(
-                                                '골 넣은 사람 등록해주세요.',
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('어웨이 점수',
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              SizedBox(
+                                                height: 40,
+                                                width: 40,
+                                                child: TextFormField(
+                                                  textAlign: TextAlign.center,
+                                                  onChanged: (value) {
+                                                    awayScore = value;
+                                                  },
+                                                ),
+                                              ),
+                                              Text(
+                                                '골 넣은사람',
                                                 style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.lightGreen),
-                                              )
-                                            : Row(
-                                                children: awayGoalHistory
-                                                    .map((e) => InkWell(
-                                                          onTap: () {
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 50,
+                                                width: 250,
+                                                child: Row(
+                                                  children: [
+                                                    Text('이름 : '),
+                                                    SizedBox(
+                                                        width: 70,
+                                                        child: TextFormField(
+                                                          controller:
+                                                              awayGoalName,
+                                                        )),
+                                                    Text('시간 : '),
+                                                    SizedBox(
+                                                        width: 30,
+                                                        child: TextFormField(
+                                                          controller:
+                                                              awayGoalTime,
+                                                        )),
+                                                    Text('분'),
+                                                    IconButton(
+                                                        onPressed: () {
+                                                          if (awayGoalName.text
+                                                                  .isNotEmpty &&
+                                                              awayGoalTime.text
+                                                                  .isNotEmpty) {
+                                                            Player p = Player(
+                                                                name:
+                                                                    awayGoalName
+                                                                        .text,
+                                                                time:
+                                                                    awayGoalTime
+                                                                        .text);
                                                             awayGoalHistory
-                                                                .remove(e);
+                                                                .add(p);
+                                                            awayGoalName
+                                                                .clear();
+                                                            awayGoalTime
+                                                                .clear();
                                                             setState(() {});
-                                                          },
-                                                          child: Text(
-                                                              '${e.name}, ${e.time}`',
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                              )),
+                                                          }
+                                                        },
+                                                        icon: Icon(
+                                                          Icons.check,
+                                                          color: Colors.green,
                                                         ))
-                                                    .toList(),
+                                                  ],
+                                                ),
                                               ),
-                                        Text(
-                                          '어시스트 한사람',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 50,
-                                          width: 250,
-                                          child: Row(
-                                            children: [
-                                              Text('이름 : '),
+                                              awayGoalHistory.isEmpty
+                                                  ? Text(
+                                                      '골 넣은 사람 등록해주세요.',
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors
+                                                              .lightGreen),
+                                                    )
+                                                  : Row(
+                                                      children: awayGoalHistory
+                                                          .map((e) => InkWell(
+                                                                onTap: () {
+                                                                  awayGoalHistory
+                                                                      .remove(
+                                                                          e);
+                                                                  setState(
+                                                                      () {});
+                                                                },
+                                                                child: Text(
+                                                                    '${e.name}, ${e.time}`',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                    )),
+                                                              ))
+                                                          .toList(),
+                                                    ),
+                                              Text(
+                                                '어시스트 한사람',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                ),
+                                              ),
                                               SizedBox(
-                                                  width: 70,
-                                                  child: TextFormField(
-                                                    controller: awayAssistName,
-                                                  )),
-                                              Text('시간 : '),
-                                              SizedBox(
-                                                  width: 30,
-                                                  child: TextFormField(
-                                                    controller: awayAssistTime,
-                                                  )),
-                                              Text('분'),
-                                              IconButton(
-                                                  onPressed: () {
-                                                    if (awayAssistName
-                                                            .text.isNotEmpty &&
-                                                        awayAssistTime
-                                                            .text.isNotEmpty) {
-                                                      Player p = Player(
-                                                          name: awayAssistName
-                                                              .text,
-                                                          time: awayAssistTime
-                                                              .text);
-                                                      awayAssistHistory.add(p);
-                                                      awayAssistName.clear();
-                                                      awayAssistTime.clear();
-                                                      setState(() {});
-                                                    }
-                                                  },
-                                                  icon: Icon(
-                                                    Icons.check,
-                                                    color: Colors.green,
-                                                  ))
+                                                height: 50,
+                                                width: 250,
+                                                child: Row(
+                                                  children: [
+                                                    Text('이름 : '),
+                                                    SizedBox(
+                                                        width: 70,
+                                                        child: TextFormField(
+                                                          controller:
+                                                              awayAssistName,
+                                                        )),
+                                                    Text('시간 : '),
+                                                    SizedBox(
+                                                        width: 30,
+                                                        child: TextFormField(
+                                                          controller:
+                                                              awayAssistTime,
+                                                        )),
+                                                    Text('분'),
+                                                    IconButton(
+                                                        onPressed: () {
+                                                          if (awayAssistName
+                                                                  .text
+                                                                  .isNotEmpty &&
+                                                              awayAssistTime
+                                                                  .text
+                                                                  .isNotEmpty) {
+                                                            Player p = Player(
+                                                                name:
+                                                                    awayAssistName
+                                                                        .text,
+                                                                time:
+                                                                    awayAssistTime
+                                                                        .text);
+                                                            awayAssistHistory
+                                                                .add(p);
+                                                            awayAssistName
+                                                                .clear();
+                                                            awayAssistTime
+                                                                .clear();
+                                                            setState(() {});
+                                                          }
+                                                        },
+                                                        icon: Icon(
+                                                          Icons.check,
+                                                          color: Colors.green,
+                                                        ))
+                                                  ],
+                                                ),
+                                              ),
+                                              awayAssistHistory.isEmpty
+                                                  ? Text(
+                                                      '골 넣은 사람 등록해주세요.',
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors
+                                                              .lightGreen),
+                                                    )
+                                                  : Row(
+                                                      children:
+                                                          awayAssistHistory
+                                                              .map(
+                                                                  (e) =>
+                                                                      InkWell(
+                                                                        onTap:
+                                                                            () {
+                                                                          awayAssistHistory
+                                                                              .remove(e);
+                                                                          setState(
+                                                                              () {});
+                                                                        },
+                                                                        child: Text(
+                                                                            '${e.name}, ${e.time}`',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontSize: 12,
+                                                                            )),
+                                                                      ))
+                                                              .toList(),
+                                                    ),
                                             ],
                                           ),
                                         ),
-                                        awayAssistHistory.isEmpty
-                                            ? Text(
-                                                '골 넣은 사람 등록해주세요.',
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.lightGreen),
-                                              )
-                                            : Row(
-                                                children: awayAssistHistory
-                                                    .map((e) => InkWell(
-                                                          onTap: () {
-                                                            awayAssistHistory
-                                                                .remove(e);
-                                                            setState(() {});
-                                                          },
-                                                          child: Text(
-                                                              '${e.name}, ${e.time}`',
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                              )),
-                                                        ))
-                                                    .toList(),
-                                              ),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
+                            )
+                          : Container(),
+                      SizedBox(
+                        height: 100,
+                        width: 300,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('리그명',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold)),
+                                SizedBox(
+                                  width: 300,
+                                  child: Autocomplete<String>(
+                                    optionsBuilder:
+                                        (TextEditingValue textEditingValue) {
+                                      if (textEditingValue.text == '') {
+                                        return const Iterable<String>.empty();
+                                      }
+                                      return _kLeagueNames
+                                          .where((String option) {
+                                        return option
+                                            .contains(textEditingValue.text);
+                                      });
+                                    },
+                                    onSelected: (String selection) {
+                                      print('You select $selection');
+                                      leagueName = selection;
+                                      print('leagueName is ${leagueName}');
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('경기장',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold)),
+                                SizedBox(
+                                  width: 100,
+                                  child: TextFormField(controller: stadium),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('경기 시간',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold)),
+                                SizedBox(
+                                  width: 100,
+                                  child: TextFormField(controller: matchTime),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      )
-                    : Container(),
-                SizedBox(
-                  height: 100,
-                  width: 300,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
+                      ),
                       Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('리그명',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          SizedBox(
-                            width: 300,
-                            child: Autocomplete<String>(
-                              optionsBuilder:
-                                  (TextEditingValue textEditingValue) {
-                                if (textEditingValue.text == '') {
-                                  return const Iterable<String>.empty();
+                          Text(currentDate.toString().split(' ')[0],
+                              style: TextStyle(fontSize: 20)),
+                          TextButton(
+                              onPressed: () => _selectDate(context),
+                              child: Text('날짜 선택')),
+                        ],
+                      ),
+                      SizedBox(
+                          height: 100,
+                          child: ElevatedButton(
+                              onPressed: () async {
+                                if (isResult) {
+                                  if (homeTeamName == null ||
+                                      awayTeamName == null ||
+                                      homeScore == null ||
+                                      awayScore == null ||
+                                      leagueName == null ||
+                                      !isDateTimeSet) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text('빈칸을 채워주세요!!!!!'),
+                                      duration: Duration(seconds: 3),
+                                    ));
+                                  } else {
+                                    switch (await postData(
+                                      homeTeamName: homeTeamName,
+                                      awayTeamName: awayTeamName,
+                                      homeScore: int.parse(homeScore!),
+                                      awayScore: int.parse(awayScore!),
+                                      homeGoalHistory: homeGoalHistory,
+                                      homeAssistHistory: homeAssistHistory,
+                                      awayGoalHistory: awayGoalHistory,
+                                      awayAssistHistory: awayAssistHistory,
+                                      leagueName: leagueName,
+                                      stadium: stadium.text,
+                                      matchTime: matchTime.text,
+                                      currentDate:
+                                          currentDate.millisecondsSinceEpoch,
+                                    )) {
+                                      case 1:
+                                        print('submit completion');
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text('전송 완료'),
+                                          duration: Duration(seconds: 3),
+                                        ));
+                                        initData();
+                                        break;
+                                      case 0:
+                                        print('submit failure');
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text('전송 실패. 다시시도해주세요.'),
+                                          duration: Duration(seconds: 3),
+                                        ));
+                                        break;
+                                    }
+                                  }
+                                } else {
+                                  if (homeTeamName == null ||
+                                      awayTeamName == null ||
+                                      leagueName == null ||
+                                      !isDateTimeSet) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text('빈칸을 채워주세요!!!!!'),
+                                      duration: Duration(seconds: 3),
+                                    ));
+                                  } else {
+                                    switch (await postData(
+                                        homeTeamName: homeTeamName,
+                                        awayTeamName: awayTeamName,
+                                        leagueName: leagueName,
+                                        stadium: stadium.text,
+                                        matchTime: matchTime.text,
+                                        currentDate: currentDate
+                                            .millisecondsSinceEpoch)) {
+                                      case 1:
+                                        print('submit completion');
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text('전송 완료'),
+                                          duration: Duration(seconds: 3),
+                                        ));
+                                        initData();
+                                        break;
+                                      case 0:
+                                        print('submit failure');
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text('전송 실패. 다시시도해주세요.'),
+                                          duration: Duration(seconds: 3),
+                                        ));
+                                        break;
+                                    }
+                                  }
                                 }
-                                return _kLeagueNames.where((String option) {
-                                  return option.contains(textEditingValue.text);
-                                });
                               },
-                              onSelected: (String selection) {
-                                print('You select $selection');
-                                leagueName = selection;
-                                print('leagueName is ${leagueName}');
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('경기장',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          SizedBox(
-                            width: 100,
-                            child: TextFormField(controller: stadium),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('경기 시간',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          SizedBox(
-                            width: 100,
-                            child: TextFormField(controller: matchTime),
-                          ),
-                        ],
-                      ),
+                              child: Text(
+                                '제출하기',
+                                style: TextStyle(fontSize: 30),
+                              ))),
+                      // DatePickerDialog(initialDate: initialDate, firstDate: firstDate, lastDate: lastDate)
                     ],
                   ),
                 ),
-                Column(
-                  children: [
-                    Text(currentDate.toString().split(' ')[0],
-                        style: TextStyle(fontSize: 20)),
-                    TextButton(
-                        onPressed: () => _selectDate(context),
-                        child: Text('날짜 선택')),
-                  ],
-                ),
-                SizedBox(
-                    height: 100,
-                    child: ElevatedButton(
-                        onPressed: () async {
-                          if (isResult) {
-                            if (homeTeamName == null ||
-                                awayTeamName == null ||
-                                homeScore == null ||
-                                awayScore == null ||
-                                leagueName == null ||
-                                !isDateTimeSet) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text('빈칸을 채워주세요!!!!!'),
-                                duration: Duration(seconds: 3),
-                              ));
-                            } else {
-                              switch (await postData(
-                                homeTeamName: homeTeamName,
-                                awayTeamName: awayTeamName,
-                                homeScore: int.parse(homeScore!),
-                                awayScore: int.parse(awayScore!),
-                                homeGoalHistory: homeGoalHistory,
-                                homeAssistHistory: homeAssistHistory,
-                                awayGoalHistory: awayGoalHistory,
-                                awayAssistHistory: awayAssistHistory,
-                                leagueName: leagueName,
-                                stadium: stadium.text,
-                                matchTime: matchTime.text,
-                                currentDate: currentDate.millisecondsSinceEpoch,
-                              )) {
-                                case 1:
-                                  print('submit completion');
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Text('전송 완료'),
-                                    duration: Duration(seconds: 3),
-                                  ));
-                                  initData();
-                                  break;
-                                case 0:
-                                  print('submit failure');
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Text('전송 실패. 다시시도해주세요.'),
-                                    duration: Duration(seconds: 3),
-                                  ));
-                                  break;
-                              }
-                            }
-                          }
-                          else {
-                            if (homeTeamName == null ||
-                                awayTeamName == null ||
-                                leagueName == null ||
-                                !isDateTimeSet) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text('빈칸을 채워주세요!!!!!'),
-                                duration: Duration(seconds: 3),
-                              ));
-                            } else {
-                              switch (await postData(
-                                  homeTeamName: homeTeamName,
-                                  awayTeamName: awayTeamName,
-                                  leagueName: leagueName,
-                                  stadium: stadium.text,
-                                  matchTime: matchTime.text,
-                                  currentDate:
-                                      currentDate.millisecondsSinceEpoch)) {
-                                case 1:
-                                  print('submit completion');
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Text('전송 완료'),
-                                    duration: Duration(seconds: 3),
-                                  ));
-                                  initData();
-                                  break;
-                                case 0:
-                                  print('submit failure');
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Text('전송 실패. 다시시도해주세요.'),
-                                    duration: Duration(seconds: 3),
-                                  ));
-                                  break;
-                              }
-                            }
-                          }
-                        },
-                        child: Text(
-                          '제출하기',
-                          style: TextStyle(fontSize: 30),
-                        ))),
-                // DatePickerDialog(initialDate: initialDate, firstDate: firstDate, lastDate: lastDate)
-              ],
-            ),
-          ),
-        ),
+              )
+            : Center(
+                child: Text('서버 연결이 좋지 못합니다. 관리자에게 문의주세요', style: TextStyle(fontSize: 20),),
+              ),
       );
     } else
       return Center(
