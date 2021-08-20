@@ -10,9 +10,9 @@ import 'package:with_admin/player.dart';
 void main() => runApp(App());
 
 // Local Server
-const String server = '211.204.237.78:8080';
-// Deploy Server
 // const String server = '211.204.237.78:8080';
+// Deploy Server
+const String server = '3.35.55.202:8080';
 
 class App extends StatelessWidget {
   @override
@@ -31,9 +31,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String homeStatus = '경기등록';
-
-  // String homeStatus = '비밀번호 입력해주세요';
+  // String homeStatus = '경기등록';
+  String homeStatus = '비밀번호 입력해주세요';
 
   void setHomeStatus(String str) {
     homeStatus = str;
@@ -887,7 +886,7 @@ class _HomeFormState extends State<HomeForm> {
               obscureText: true,
               onFieldSubmitted: (value) {
                 print(value);
-                if (value == '123123') {
+                if (value == '153153') {
                   widget.setHomeStatus('경기등록');
                   // loadData();
                 }
