@@ -8,10 +8,12 @@ import 'package:with_admin/player.dart';
 void main() => runApp(App());
 
 // Local Server
-// const String server = '211.204.237.78:8080';
+const String server = '211.204.237.78:8080';
 
 // Deploy Server
-const String server = '3.35.55.202:8080';
+// const String server = '3.35.55.202:8080';
+
+// 153153 => 김민석
 
 class App extends StatelessWidget {
   @override
@@ -32,9 +34,15 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   // String homeStatus = '경기등록';
   String homeStatus = '비밀번호 입력해주세요';
+  String passwordStatus = '';
 
   void setHomeStatus(String str) {
     homeStatus = str;
+    setState(() {});
+  }
+
+  void setPasswordStatus(String str) {
+    passwordStatus = str;
     setState(() {});
   }
 
@@ -47,8 +55,10 @@ class _HomeState extends State<Home> {
       drawer: CustomDrawer(setHomeStatus: setHomeStatus),
       body: HomeForm(
         homeStatus: homeStatus,
-        formKey: GlobalKey(),
         setHomeStatus: setHomeStatus,
+        password: passwordStatus,
+        setPasswordStatus: setPasswordStatus,
+        formKey: GlobalKey(),
       ),
     );
   }
@@ -60,30 +70,40 @@ class HomeForm extends StatefulWidget {
     required this.homeStatus,
     required this.formKey,
     required this.setHomeStatus,
+    required this.password,
+    required this.setPasswordStatus,
   }) : super(key: key);
 
   final String homeStatus;
-  final GlobalKey<FormState> formKey;
   final Function setHomeStatus;
+  final String password;
+  final Function setPasswordStatus;
+  final GlobalKey<FormState> formKey;
 
   @override
   _HomeFormState createState() => _HomeFormState();
 }
 
 class _HomeFormState extends State<HomeForm> {
-  String? homeTeamName;
-  String? awayTeamName;
-  String? homeScore;
-  String? awayScore;
+  // String? homeTeamName;
+  // String? awayTeamName;
+  // String? homeScore;
+  // String? awayScore;
   List<Player> homeGoalHistory = [];
   List<Player> homeAssistHistory = [];
   List<Player> awayGoalHistory = [];
   List<Player> awayAssistHistory = [];
-  String? leagueName;
+
+  // String? leagueName;
   DateTime currentDate = DateTime.now();
   bool isDateTimeSet = false;
   bool isResult = true;
 
+  TextEditingController homeTeamName = TextEditingController();
+  TextEditingController awayTeamName = TextEditingController();
+  TextEditingController homeScore = TextEditingController();
+  TextEditingController awayScore = TextEditingController();
+  TextEditingController leagueName = TextEditingController();
   TextEditingController homeGoalName = TextEditingController();
   TextEditingController homeGoalTime = TextEditingController();
   TextEditingController homeAssistName = TextEditingController();
@@ -149,6 +169,7 @@ class _HomeFormState extends State<HomeForm> {
     required String? leagueName,
     String? stadium,
     String? matchTime,
+    String? password,
     required int? currentDate,
   }) async {
     var url = Uri.http('$server', '/api/setClubRecord');
@@ -173,6 +194,8 @@ class _HomeFormState extends State<HomeForm> {
       'currentDate': currentDate,
       'stadium': stadium,
       'matchTime': matchTime,
+      'createdId': password,
+      'updatedId': password
     });
     var response = await http.post(
       url,
@@ -191,10 +214,22 @@ class _HomeFormState extends State<HomeForm> {
 
   void initData() {
     isDateTimeSet = false;
+    currentDate = DateTime.now();
+    homeTeamName.clear();
+    awayTeamName.clear();
+    homeScore.clear();
+    awayScore.clear();
+    leagueName.clear();
+    stadium.clear();
+    matchTime.clear();
+    homeGoalHistory.clear();
+    homeAssistHistory.clear();
+    awayGoalHistory.clear();
+    awayAssistHistory.clear();
+    setState(() {});
   }
 
   List<String> _kTeamNames = <String>[];
-
 
   List<String> _kLeagueNames = <String>[];
 
@@ -244,8 +279,17 @@ class _HomeFormState extends State<HomeForm> {
                                   },
                                   onSelected: (String selection) {
                                     print('You select $selection');
-                                    homeTeamName = selection;
-                                    print('homeTeamName is ${homeTeamName}');
+                                    homeTeamName.text = selection;
+                                    print(
+                                        'homeTeamName is ${homeTeamName.text}');
+                                  },
+                                  fieldViewBuilder: (context, controller,
+                                      focusNode, onSubmit) {
+                                    homeTeamName = controller;
+                                    return TextFormField(
+                                      controller: controller,
+                                      focusNode: focusNode,
+                                    );
                                   },
                                 ),
                               ],
@@ -272,10 +316,19 @@ class _HomeFormState extends State<HomeForm> {
                                           .contains(textEditingValue.text);
                                     });
                                   },
+                                  fieldViewBuilder: (context, controller,
+                                      focusNode, onFieldSubmit) {
+                                    awayTeamName = controller;
+                                    return TextFormField(
+                                      controller: controller,
+                                      focusNode: focusNode,
+                                    );
+                                  },
                                   onSelected: (String selection) {
                                     print('You select $selection');
-                                    awayTeamName = selection;
-                                    print('awayTeamName is ${awayTeamName}');
+                                    awayTeamName.text = selection;
+                                    print(
+                                        'awayTeamName is ${awayTeamName.text}');
                                   },
                                 ),
                               ],
@@ -287,8 +340,8 @@ class _HomeFormState extends State<HomeForm> {
                           value: isResult,
                           onChanged: (value) {
                             isResult = !isResult;
-                            homeScore = null;
-                            awayScore = null;
+                            homeScore.text = '';
+                            awayScore.text = '';
                             setState(() {});
                           }),
                       isResult
@@ -319,8 +372,9 @@ class _HomeFormState extends State<HomeForm> {
                                                 width: 40,
                                                 child: TextFormField(
                                                   textAlign: TextAlign.center,
+                                                  controller: homeScore,
                                                   onChanged: (value) {
-                                                    homeScore = value;
+                                                    homeScore.text = value;
                                                   },
                                                 ),
                                               ),
@@ -512,8 +566,9 @@ class _HomeFormState extends State<HomeForm> {
                                                 width: 40,
                                                 child: TextFormField(
                                                   textAlign: TextAlign.center,
+                                                  controller: awayScore,
                                                   onChanged: (value) {
-                                                    awayScore = value;
+                                                    awayScore.text = value;
                                                   },
                                                 ),
                                               ),
@@ -726,8 +781,15 @@ class _HomeFormState extends State<HomeForm> {
                                     },
                                     onSelected: (String selection) {
                                       print('You select $selection');
-                                      leagueName = selection;
-                                      print('leagueName is ${leagueName}');
+                                      leagueName.text = selection;
+                                      print('leagueName is ${leagueName.text}');
+                                    },
+                                    fieldViewBuilder: (context, controller,
+                                        focusNode, onFieldSubmitted) {
+                                      leagueName = controller;
+                                      return TextFormField(
+                                          controller: controller,
+                                          focusNode: focusNode);
                                     },
                                   ),
                                 ),
@@ -776,11 +838,11 @@ class _HomeFormState extends State<HomeForm> {
                           child: ElevatedButton(
                               onPressed: () async {
                                 if (isResult) {
-                                  if (homeTeamName == null ||
-                                      awayTeamName == null ||
-                                      homeScore == null ||
-                                      awayScore == null ||
-                                      leagueName == null ||
+                                  if (homeTeamName.text == "" ||
+                                      awayTeamName.text == "" ||
+                                      homeScore.text == "" ||
+                                      awayScore.text == "" ||
+                                      leagueName.text == "" ||
                                       !isDateTimeSet) {
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(SnackBar(
@@ -789,19 +851,20 @@ class _HomeFormState extends State<HomeForm> {
                                     ));
                                   } else {
                                     switch (await postData(
-                                      homeTeamName: homeTeamName,
-                                      awayTeamName: awayTeamName,
-                                      homeScore: int.parse(homeScore!),
-                                      awayScore: int.parse(awayScore!),
+                                      homeTeamName: homeTeamName.text,
+                                      awayTeamName: awayTeamName.text,
+                                      homeScore: int.parse(homeScore.text),
+                                      awayScore: int.parse(awayScore.text),
                                       homeGoalHistory: homeGoalHistory,
                                       homeAssistHistory: homeAssistHistory,
                                       awayGoalHistory: awayGoalHistory,
                                       awayAssistHistory: awayAssistHistory,
-                                      leagueName: leagueName,
+                                      leagueName: leagueName.text,
                                       stadium: stadium.text,
                                       matchTime: matchTime.text,
                                       currentDate:
                                           currentDate.millisecondsSinceEpoch,
+                                      password: widget.password,
                                     )) {
                                       case 1:
                                         print('submit completion');
@@ -822,11 +885,10 @@ class _HomeFormState extends State<HomeForm> {
                                         return;
                                     }
                                   }
-                                }
-                                else {
-                                  if (homeTeamName == null ||
-                                      awayTeamName == null ||
-                                      leagueName == null ||
+                                } else {
+                                  if (homeTeamName.text == '' ||
+                                      awayTeamName.text == '' ||
+                                      leagueName.text == '' ||
                                       !isDateTimeSet) {
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(SnackBar(
@@ -835,13 +897,14 @@ class _HomeFormState extends State<HomeForm> {
                                     ));
                                   } else {
                                     switch (await postData(
-                                        homeTeamName: homeTeamName,
-                                        awayTeamName: awayTeamName,
-                                        leagueName: leagueName,
+                                        homeTeamName: homeTeamName.text,
+                                        awayTeamName: awayTeamName.text,
+                                        leagueName: leagueName.text,
                                         stadium: stadium.text,
                                         matchTime: matchTime.text,
-                                        currentDate: currentDate
-                                            .millisecondsSinceEpoch)) {
+                                        currentDate:
+                                            currentDate.millisecondsSinceEpoch,
+                                        password: widget.password)) {
                                       case 1:
                                         print('submit completion');
                                         ScaffoldMessenger.of(context)
@@ -873,7 +936,10 @@ class _HomeFormState extends State<HomeForm> {
                 ),
               )
             : Center(
-                child: Text('서버 연결이 좋지 못합니다. 관리자에게 문의주세요', style: TextStyle(fontSize: 20),),
+                child: Text(
+                  '서버 연결이 좋지 못합니다. 관리자에게 문의주세요',
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
       );
     } else
@@ -889,7 +955,7 @@ class _HomeFormState extends State<HomeForm> {
                 print(value);
                 if (value == '153153') {
                   widget.setHomeStatus('경기등록');
-                  // loadData();
+                  widget.setPasswordStatus(value);
                 }
               },
             ),
