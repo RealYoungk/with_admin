@@ -67326,8 +67326,8 @@ qi(){var s=0,r=P.a4(t.z),q=1,p,o=[],n=this,m,l,k,j,i,h,g,f,e,d
 var $async$qi=P.a0(function(a,b){if(a===1){p=b
 s=q}while(true)switch(s){case 0:j=t.N
 i=t.z
-h=P.agB("http","211.204.237.78:8080","/api/getLeagueName",P.av(["q","{http}","Content-Type","application/json;charset=UTF-8"],j,i))
-g=P.agB("http","211.204.237.78:8080","/api/getClubName",P.av(["q","{http}","Content-Type","application/json;charset=UTF-8"],j,i))
+h=P.agB("http","3.35.55.202:8080","/api/getLeagueName",P.av(["q","{http}","Content-Type","application/json;charset=UTF-8"],j,i))
+g=P.agB("http","3.35.55.202:8080","/api/getClubName",P.av(["q","{http}","Content-Type","application/json;charset=UTF-8"],j,i))
 f=null
 e=null
 q=3
@@ -67359,7 +67359,7 @@ qF(a,b,c,d,e,f,g,h,i,j,k,l,m){return this.adI(a,b,c,d,e,f,g,h,i,j,k,l,m)},
 adH(a,b,c,d,e,f,g){return this.qF(null,null,null,a,b,null,null,null,c,d,e,f,g)},
 adI(a,b,c,d,e,f,g,h,a0,a1,a2,a3,a4){var s=0,r=P.a4(t.S),q,p,o,n,m,l,k,j,i
 var $async$qF=P.a0(function(a5,a6){if(a5===1)return P.a1(a6,r)
-while(true)switch(s){case 0:i=P.agB("http","211.204.237.78:8080","/api/setClubRecord",null)
+while(true)switch(s){case 0:i=P.agB("http","3.35.55.202:8080","/api/setClubRecord",null)
 if(g==null)p=null
 else{p=H.ah(g).j("ar<1,af<m,@>>")
 p=P.az(new H.ar(g,new F.a8F(),p),!0,p.j("bb.E"))}if(f==null)o=null
